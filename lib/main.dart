@@ -67,28 +67,80 @@ class _MyHomePageState extends State<MyHomePage> {
       body: FutureBuilder(
           future: getHotels(),
           builder: (context, snapshot) {
-            return snapshot.hasData
-                ? Center(
-                    child: isGrid
-                        ? GridView.builder(
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2),
-                            itemCount: snapshot.data?.length,
-                            itemBuilder: (context, index) {
-                              return Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Card(
-                                  child: Column(
+            if (snapshot.hasData) {
+              return Center(
+                child: isGrid
+                    ? GridView.builder(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2),
+                        itemCount: snapshot.data?.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Card(
+                              child: Column(
+                                children: [
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Image.asset(
+                                          'assets/images/${snapshot.data![index].poster}'),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 8.0),
+                                    child: Text(snapshot.data![index].name),
+                                  ),
+                                  ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.of(context).push(
+                                          PageRouteBuilder(pageBuilder:
+                                              (context, animation,
+                                                  secondAnimation) {
+                                            return HotelInfo(
+                                              uuid: snapshot.data![index].uuid,
+                                              title: snapshot.data![index].name,
+                                            );
+                                          }, transitionsBuilder: (context,
+                                              animation,
+                                              secondaryAnimation,
+                                              child) {
+                                            CurvedAnimation curved =
+                                                CurvedAnimation(
+                                                    parent: animation,
+                                                    curve: Curves.slowMiddle);
+                                            Animation<double> animate =
+                                                Tween<double>(
+                                                        begin: 0.0, end: 1.0)
+                                                    .animate(curved);
+                                            return FadeTransition(
+                                              opacity: animate,
+                                              child: child,
+                                            );
+                                          }),
+                                        );
+                                      },
+                                      child: const Text('Подробнее')),
+                                ],
+                              ),
+                            ),
+                          );
+                        })
+                    : ListView.builder(
+                        itemCount: snapshot.data?.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Card(
+                              child: Column(
+                                children: [
+                                  Image.asset(
+                                      'assets/images/${snapshot.data![index].poster}'),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Expanded(
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 8.0),
-                                          child: Image.asset(
-                                              'assets/images/${snapshot.data![index].poster}'),
-                                        ),
-                                      ),
                                       Padding(
                                         padding:
                                             const EdgeInsets.only(left: 8.0),
@@ -97,93 +149,37 @@ class _MyHomePageState extends State<MyHomePage> {
                                       ElevatedButton(
                                           onPressed: () {
                                             Navigator.of(context).push(
-                                              PageRouteBuilder(pageBuilder:
-                                                  (context, animation,
-                                                      secondAnimation) {
-                                                return HotelInfo(
-                                                  uuid: snapshot
-                                                      .data![index].uuid,
-                                                  title: snapshot
-                                                      .data![index].name,
-                                                );
-                                              }, transitionsBuilder: (context,
-                                                  animation,
-                                                  secondaryAnimation,
-                                                  child) {
-                                                CurvedAnimation curved =
-                                                    CurvedAnimation(
-                                                        parent: animation,
-                                                        curve:
-                                                            Curves.slowMiddle);
-                                                Animation<double> animate =
-                                                    Tween<double>(
-                                                            begin: 0.0,
-                                                            end: 1.0)
-                                                        .animate(curved);
-                                                return FadeTransition(
-                                                  opacity: animate,
-                                                  child: child,
-                                                );
-                                              }),
-                                            );
+                                                PageRouteBuilder(pageBuilder:
+                                                    (context, animation,
+                                                        secondAnimation) {
+                                              return HotelInfo(
+                                                uuid:
+                                                    snapshot.data![index].uuid,
+                                                title:
+                                                    snapshot.data![index].name,
+                                              );
+                                            }));
                                           },
-                                          child: const Text('Подробнее')),
+                                          child: const Text('Подробнее'))
                                     ],
                                   ),
-                                ),
-                              );
-                            })
-                        : ListView.builder(
-                            itemCount: snapshot.data?.length,
-                            itemBuilder: (context, index) {
-                              return Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Card(
-                                  child: Column(
-                                    children: [
-                                      Image.asset(
-                                          'assets/images/${snapshot.data![index].poster}'),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 8.0),
-                                            child: Text(
-                                                snapshot.data![index].name),
-                                          ),
-                                          ElevatedButton(
-                                              onPressed: () {
-                                                Navigator.of(context).push(
-                                                    PageRouteBuilder(
-                                                        pageBuilder: (context,
-                                                            animation,
-                                                            secondAnimation) {
-                                                  return HotelInfo(
-                                                    uuid: snapshot
-                                                        .data![index].uuid,
-                                                    title: snapshot
-                                                        .data![index].name,
-                                                  );
-                                                }));
-                                              },
-                                              child: const Text('Подробнее'))
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }),
-                  )
-                : snapshot.hasError
-                    ? const Center(
-                        child: Text('Ошибка'),
-                      )
-                    : const Center(
-                        child: CircularProgressIndicator(),
-                      );
+                                ],
+                              ),
+                            ),
+                          );
+                        }),
+              );
+            } else {
+              if (snapshot.hasError) {
+                return const Center(
+                  child: Text('Ошибка'),
+                );
+              } else {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+            }
           }),
     );
   }
